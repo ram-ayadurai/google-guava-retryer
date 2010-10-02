@@ -46,11 +46,11 @@ public class RetryerBuilder {
 		return this;
 	}
 
-	private class RetryerImpl implements Retryer {
+	private static final class RetryerImpl implements Retryer {
 
-		final int times;
-		final Duration interval;
-		final Predicate<Exception> condition;
+		private final int times;
+		private final Duration interval;
+		private final Predicate<Exception> condition;
 		
 		public RetryerImpl(RetryerBuilder retryerBuilder) {
 			this.times = retryerBuilder.times;
@@ -67,7 +67,7 @@ public class RetryerBuilder {
 			try {
 				return retryableTask.call();
 			} catch (Exception exception) {
-				if (times != 0) {
+				if (retryTimes != 0) {
 					if (condition.apply(exception)) {
 						interval.sleep();
 						return doWithRetryTimesReduction(retryableTask, retryTimes - 1);
@@ -78,11 +78,11 @@ public class RetryerBuilder {
 		}
 	}
 	
-	private static class Duration {
-		final long duration;
-		final TimeUnit timeUnit;
+	private final static class Duration {
+		private final long duration;
+		private final TimeUnit timeUnit;
 		
-		public Duration(long duration, TimeUnit timeUnit) {
+		private Duration(long duration, TimeUnit timeUnit) {
 			this.duration = duration;
 			this.timeUnit = timeUnit;
 		}
