@@ -9,4 +9,6 @@ import java.util.concurrent.Callable;
 public interface Retryer {
 
 	<T> T callWithRetry(Callable<T> retryableTask) throws Exception;
+	
+	<T> T newProxy(T target, Class<T> interfaceType);
 }

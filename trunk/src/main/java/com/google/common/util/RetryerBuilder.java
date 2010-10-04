@@ -3,11 +3,16 @@ package com.google.common.util;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.base.Throwables;
 /**
  * 
  * @author wangzijian
@@ -75,6 +80,36 @@ public class RetryerBuilder {
 				}
 				throw exception;
 			}
+		}
+
+		@Override
+		public <T> T newProxy(final T target, Class<T> interfaceType) {
+			checkNotNull(target, "target");
+			checkNotNull(interfaceType, "interfaceType");
+			InvocationHandler handler = new InvocationHandler() {
+				public Object invoke(
+						final Object obj, 
+						final Method method, 
+						final Object[] args) throws Throwable {
+					Callable<Object> retryableTask = new Callable<Object>() {
+								public Object call() throws Exception {
+									try {
+										return method.invoke(target, args);
+									} catch (InvocationTargetException e) {
+										Throwables.throwCause(e, false);
+										throw new AssertionError("can't get here");
+									}
+								}
+							};
+					return callWithRetry(retryableTask);
+				}
+			};
+			return newProxy(interfaceType, handler);
+		}
+		
+		private static <T> T newProxy(Class<T> interfaceType, InvocationHandler handler) {
+			Object object = Proxy.newProxyInstance(interfaceType.getClassLoader(), new Class<?>[] { interfaceType }, handler);
+			return interfaceType.cast(object);
 		}
 	}
 	
