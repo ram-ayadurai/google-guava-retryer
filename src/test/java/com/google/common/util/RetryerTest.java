@@ -1,7 +1,7 @@
 package com.google.common.util;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -49,8 +49,10 @@ public class RetryerTest {
 		
 		when(heavySevice.doSometing()).thenReturn(response);
 		
-		Response actual = retryer.callWithRetry(heavyTask);
-		assertThat(actual, sameInstance(response));
+		assertThat(retryer.callWithRetry(heavyTask), sameInstance(response));
+		
+		HeavySevice retryableHeavySevice = retryer.newProxy(heavySevice, HeavySevice.class);
+		assertThat(retryableHeavySevice.doSometing(), sameInstance(response));
 	}
 	
 	@Test
@@ -67,6 +69,22 @@ public class RetryerTest {
 		
 		Response actual = retryer.callWithRetry(heavyTask);
 		assertThat(actual, sameInstance(response));
+	}
+	
+	@Test
+	public void testSucessAfterRetry2() throws Exception {
+		Retryer retryer = new RetryerBuilder()
+			.times(3)
+			.interval(100, TimeUnit.MILLISECONDS)
+			.build();
+		
+		when(heavySevice.doSometing())
+			.thenThrow(new RuntimeException("Mock"))
+			.thenThrow(new RuntimeException("Mock"))
+			.thenReturn(response);
+		
+		HeavySevice retryableHeavySevice = retryer.newProxy(heavySevice, HeavySevice.class);
+		assertThat(retryableHeavySevice.doSometing(), sameInstance(response));
 	}
 	
 	@Test(expected = RuntimeException.class)
