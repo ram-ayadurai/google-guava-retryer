@@ -13,10 +13,31 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Throwables;
+
 /**
+ * A Retry builder can build Retryer with retry policy and condition.
+ * <pre>
+ * Retryer retryer = new RetryerBuilder()
+ * 	.times(3)
+ * 	.interval(10, TimeUnit.SECONDS)
+ * 	.when(timeout())
+ * 	.build();
+ * </pre>
+ * 
+ * Retry condition:
+ * <pre>
+ * private static Predicate<Exception> timeout() {
+ * 	return new Predicate<Exception>() {
+ * 		public boolean apply(Exception exception) {
+ * 			if (exception instanceof TimeoutException) {
+ * 				return exception.getMessage().startsWith("Retryable");
+ * 			}
+ *		}
+ * 	}
+ * }
+ * </pre>
  * 
  * @author wangzijian
- *
  */
 public class RetryerBuilder {
 
