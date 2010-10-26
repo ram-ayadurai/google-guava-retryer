@@ -1,6 +1,7 @@
 package com.google.common.util;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
@@ -99,8 +100,8 @@ public class RetryerTest {
 			.thenThrow(new RuntimeException("Mock"))
 			.thenThrow(new RuntimeException("Mock"));
 		
-		Response actual = retryer.callWithRetry(heavyTask);
-		assertThat(actual, sameInstance(response));
+		retryer.callWithRetry(heavyTask);
+		fail();
 	}
 	
 	@Test(expected = RuntimeException.class)
@@ -115,8 +116,8 @@ public class RetryerTest {
 		when(heavySevice.doSometing())
 			.thenThrow(new RuntimeException("Mock"));
 		
-		Response actual = retryer.callWithRetry(heavyTask);
-		assertThat(actual, sameInstance(response));
+		retryer.callWithRetry(heavyTask);
+		fail();
 	}
 	
 	private interface Response {
