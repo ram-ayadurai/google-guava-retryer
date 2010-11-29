@@ -1,11 +1,11 @@
 package com.google.common.util;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class RetryerTest {
 	public void testSucessAfterRetry() throws Exception {
 		Retryer retryer = new RetryerBuilder()
 			.times(3)
-			.interval(100, TimeUnit.MILLISECONDS)
+			.interval(100, MILLISECONDS)
 			.build();
 	
 		when(heavySevice.doSometing())
@@ -76,7 +76,7 @@ public class RetryerTest {
 	public void testSucessAfterRetry2() throws Exception {
 		Retryer retryer = new RetryerBuilder()
 			.times(3)
-			.interval(100, TimeUnit.MILLISECONDS)
+			.interval(100, MILLISECONDS)
 			.build();
 		
 		when(heavySevice.doSometing())
@@ -92,7 +92,7 @@ public class RetryerTest {
 	public void testFailureAfterRetry() throws Exception {
 		Retryer retryer = new RetryerBuilder()
 			.times(3)
-			.interval(100, TimeUnit.MILLISECONDS)
+			.interval(100, MILLISECONDS)
 			.build();
 		
 		when(heavySevice.doSometing())
@@ -109,7 +109,7 @@ public class RetryerTest {
 		Predicate<Exception> alwaysFalse = Predicates.alwaysFalse();
 		Retryer retryer = new RetryerBuilder()
 			.times(3)
-			.interval(100, TimeUnit.MILLISECONDS)
+			.interval(100, MILLISECONDS)
 			.when(alwaysFalse)
 			.build();
 		
