@@ -3,8 +3,9 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.*;
+
 import java.util.concurrent.Callable;
 
 import org.junit.Before;
@@ -58,6 +59,7 @@ public class RetryerTest {
 		Retryer retryer = new RetryerBuilder()
 			.times(3)
 			.interval(100, MILLISECONDS)
+			.whenThrow(exception())
 			.build();
 	
 		when(heavySevice.doSometing())
@@ -74,6 +76,7 @@ public class RetryerTest {
 		Retryer retryer = new RetryerBuilder()
 			.times(3)
 			.interval(10, MILLISECONDS)
+			.whenThrow(exception())
 			.build();
 
 		for (int i = 0 ; i < 10 ; i ++) {
@@ -94,6 +97,7 @@ public class RetryerTest {
 		Retryer retryer = new RetryerBuilder()
 			.times(3)
 			.interval(100, MILLISECONDS)
+			.whenThrow(exception())
 			.build();
 		
 		when(heavySevice.doSometing())
@@ -182,6 +186,10 @@ public class RetryerTest {
 		
 		retryer.callWithRetry(heavyTask);
 		fail();
+	}
+	
+	private Predicate<Exception> exception() {
+		return Predicates.alwaysTrue();
 	}
 	
 	private interface HeavySevice {
