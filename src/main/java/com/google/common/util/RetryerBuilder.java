@@ -44,7 +44,7 @@ public class RetryerBuilder {
 	private static final Duration DEFAULT_INTERVAL = new Duration(0, TimeUnit.SECONDS);
 	private static final int DEFAULT_RETRY_TIMES = 3;
 	
-	private Predicate<Exception> throwCondition = Predicates.alwaysTrue();
+	private Predicate<Exception> throwCondition = Predicates.alwaysFalse();
 	private Predicate<Object> returnCondition = Predicates.alwaysFalse();
 	private Duration interval = DEFAULT_INTERVAL;
 	private int times = DEFAULT_RETRY_TIMES;
